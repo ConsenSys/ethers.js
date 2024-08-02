@@ -8,12 +8,7 @@
 import { accessListify } from "../transaction/index.js";
 import { getBigInt, assert, assertArgument } from "../utils/index.js";
 
-import {
-  EnsPlugin,
-  FetchUrlFeeDataNetworkPlugin,
-  FetchLineaFeeDataNetworkPlugin,
-  GasCostPlugin,
-} from "./plugins-network.js";
+import { EnsPlugin, FetchUrlFeeDataNetworkPlugin, FetchLineaFeeDataNetworkPlugin, GasCostPlugin } from "./plugins-network.js";
 
 import type { BigNumberish } from "../utils/index.js";
 import type { TransactionLike } from "../transaction/index.js";
@@ -28,12 +23,7 @@ import { JsonRpcProvider } from "./provider-jsonrpc.js";
  *  - a well-known (or registered) chain ID
  *  - an object with sufficient details to describe a network
  */
-export type Networkish =
-  | Network
-  | number
-  | bigint
-  | string
-  | {
+export type Networkish = Network | number | bigint | string | {
       name?: string;
       chainId?: number;
       //layerOneConnection?: Provider,
@@ -93,22 +83,14 @@ export class Network {
    *  This is the canonical name, as networks migh have multiple
    *  names.
    */
-  get name(): string {
-    return this.#name;
-  }
-  set name(value: string) {
-    this.#name = value;
-  }
+  get name(): string { return this.#name; }
+  set name(value: string) { this.#name = value; }
 
   /**
    *  The network chain ID.
    */
-  get chainId(): bigint {
-    return this.#chainId;
-  }
-  set chainId(value: BigNumberish) {
-    this.#chainId = getBigInt(value, "chainId");
-  }
+  get chainId(): bigint { return this.#chainId; }
+  set chainId(value: BigNumberish) { this.#chainId = getBigInt(value, "chainId"); }
 
   /**
    *  Returns true if %%other%% matches this network. Any chain ID
@@ -118,9 +100,7 @@ export class Network {
    *  such as ENS address or plug-in compatibility.
    */
   matches(other: Networkish): boolean {
-    if (other == null) {
-      return false;
-    }
+    if (other == null) { return false; }
 
     if (typeof other === "string") {
       try {
@@ -184,12 +164,8 @@ export class Network {
    *  Gets a list of all plugins that match %%name%%, with otr without
    *  a fragment.
    */
-  getPlugins<T extends NetworkPlugin = NetworkPlugin>(
-    basename: string
-  ): Array<T> {
-    return <Array<T>>(
-      this.plugins.filter((p) => p.name.split("#")[0] === basename)
-    );
+  getPlugins<T extends NetworkPlugin = NetworkPlugin>( basename: string ): Array<T> {
+    return <Array<T>>(this.plugins.filter((p) => p.name.split("#")[0] === basename));
   }
 
   /**
@@ -210,14 +186,10 @@ export class Network {
    *  values.
    */
   computeIntrinsicGas(tx: TransactionLike): number {
-    const costs =
-      this.getPlugin<GasCostPlugin>("org.ethers.plugins.network.GasCost") ||
-      new GasCostPlugin();
+    const costs = this.getPlugin<GasCostPlugin>("org.ethers.plugins.network.GasCost") || new GasCostPlugin();
 
     let gas = costs.txBase;
-    if (tx.to == null) {
-      gas += costs.txCreate;
-    }
+    if (tx.to == null) { gas += costs.txCreate; }
     if (tx.data) {
       for (let i = 2; i < tx.data.length; i += 2) {
         if (tx.data.substring(i, i + 2) === "00") {
@@ -231,9 +203,7 @@ export class Network {
     if (tx.accessList) {
       const accessList = accessListify(tx.accessList);
       for (const addr in accessList) {
-        gas +=
-          costs.txAccessListAddress +
-          costs.txAccessListStorageKey * accessList[addr].storageKeys.length;
+        gas += costs.txAccessListAddress + costs.txAccessListStorageKey * accessList[addr].storageKeys.length;
       }
     }
 
@@ -247,19 +217,13 @@ export class Network {
     injectCommonNetworks();
 
     // Default network
-    if (network == null) {
-      return Network.from("mainnet");
-    }
+    if (network == null) { return Network.from("mainnet"); }
 
     // Canonical name or chain ID
-    if (typeof network === "number") {
-      network = BigInt(network);
-    }
+    if (typeof network === "number") { network = BigInt(network);}
     if (typeof network === "string" || typeof network === "bigint") {
       const networkFunc = Networks.get(network);
-      if (networkFunc) {
-        return networkFunc();
-      }
+      if (networkFunc) { return networkFunc(); }
       if (typeof network === "bigint") {
         return new Network("unknown", network);
       }
@@ -278,18 +242,13 @@ export class Network {
     // Networkish
     if (typeof network === "object") {
       assertArgument(
-        typeof network.name === "string" && typeof network.chainId === "number",
-        "invalid network object name or chainId",
-        "network",
-        network
+        typeof network.name === "string" && typeof network.chainId === "number", "invalid network object name or chainId", "network", network
       );
 
       const custom = new Network(<string>network.name, <number>network.chainId);
 
       if ((<any>network).ensAddress || (<any>network).ensNetwork != null) {
-        custom.attachPlugin(
-          new EnsPlugin((<any>network).ensAddress, (<any>network).ensNetwork)
-        );
+        custom.attachPlugin(new EnsPlugin((<any>network).ensAddress, (<any>network).ensNetwork));
       }
 
       //if ((<any>network).layerOneConnection) {
@@ -306,21 +265,11 @@ export class Network {
    *  Register %%nameOrChainId%% with a function which returns
    *  an instance of a Network representing that chain.
    */
-  static register(
-    nameOrChainId: string | number | bigint,
-    networkFunc: () => Network
-  ): void {
-    if (typeof nameOrChainId === "number") {
-      nameOrChainId = BigInt(nameOrChainId);
-    }
+  static register( nameOrChainId: string | number | bigint, networkFunc: () => Network ): void {
+    if (typeof nameOrChainId === "number") { nameOrChainId = BigInt(nameOrChainId); }
     const existing = Networks.get(nameOrChainId);
     if (existing) {
-      assertArgument(
-        false,
-        `conflicting network for ${JSON.stringify(existing.name)}`,
-        "nameOrChainId",
-        nameOrChainId
-      );
+      assertArgument( false, `conflicting network for ${JSON.stringify(existing.name)}`, "nameOrChainId", nameOrChainId );
     }
     Networks.set(nameOrChainId, networkFunc);
   }
@@ -344,9 +293,7 @@ function parseUnits(_value: number | string, decimals: number): bigint {
 
   // Break into [ whole, fraction ]
   const comps = value.split(".");
-  if (comps.length === 1) {
-    comps.push("");
-  }
+  if (comps.length === 1) { comps.push(""); }
 
   // More than 1 decimal point or too many fractional positions
   if (comps.length !== 2) {
@@ -354,16 +301,12 @@ function parseUnits(_value: number | string, decimals: number): bigint {
   }
 
   // Pad the fraction to 9 decimalplaces
-  while (comps[1].length < decimals) {
-    comps[1] += "0";
-  }
+  while (comps[1].length < decimals) { comps[1] += "0"; }
 
   // Too many decimals and some non-zero ending, take the ceiling
   if (comps[1].length > 9) {
     let frac = BigInt(comps[1].substring(0, 9));
-    if (!comps[1].substring(9).match(/^0+$/)) {
-      frac++;
-    }
+    if (!comps[1].substring(9).match(/^0+$/)) { frac++; }
     comps[1] = frac.toString();
   }
 
@@ -372,46 +315,33 @@ function parseUnits(_value: number | string, decimals: number): bigint {
 
 // Used by Polygon to use a gas station for fee data
 function getGasStationPlugin(url: string) {
-  return new FetchUrlFeeDataNetworkPlugin(
-    url,
-    async (fetchFeeData, provider, request) => {
-      // Prevent Cloudflare from blocking our request in node.js
-      request.setHeader("User-Agent", "ethers");
+  return new FetchUrlFeeDataNetworkPlugin( url, async (fetchFeeData, provider, request) => {
+    // Prevent Cloudflare from blocking our request in node.js
+    request.setHeader("User-Agent", "ethers");
 
-      let response;
-      try {
-        const [_response, _feeData] = await Promise.all([
-          request.send(),
-          fetchFeeData(),
-        ]);
-        response = _response;
-        const payload = response.bodyJson.standard;
-        const feeData = {
-          gasPrice: _feeData.gasPrice,
-          maxFeePerGas: parseUnits(payload.maxFee, 9),
-          maxPriorityFeePerGas: parseUnits(payload.maxPriorityFee, 9),
-        };
-        return feeData;
-      } catch (error: any) {
-        assert(
-          false,
-          `error encountered with polygon gas station (${JSON.stringify(
-            request.url
-          )})`,
-          "SERVER_ERROR",
-          { request, response, error }
-        );
-      }
+    let response;
+    try {
+      const [_response, _feeData] = await Promise.all([
+        request.send(), fetchFeeData()
+      ]);
+      response = _response;
+      const payload = response.bodyJson.standard;
+      const feeData = {
+        gasPrice: _feeData.gasPrice,
+        maxFeePerGas: parseUnits(payload.maxFee, 9),
+        maxPriorityFeePerGas: parseUnits(payload.maxPriorityFee, 9),
+      };
+      return feeData;
+    } catch (error: any) {
+      assert( false, `error encountered with polygon gas station (${JSON.stringify( request.url )})`, "SERVER_ERROR", { request, response, error });
     }
-  );
+  });
 }
 
 // Used by Linea to get fee data
 function getLineaPricingPlugin(fallbackUrl: string) {
   const BASE_FEE_PER_GAS_MARGIN = 1.35;
-  return new FetchLineaFeeDataNetworkPlugin(
-    fallbackUrl,
-    async (provider: any, tx) => {
+  return new FetchLineaFeeDataNetworkPlugin( fallbackUrl, async (provider: any, tx) => {
       const attemptEstimateGas = async (provider: any, tx: TransactionLike) => {
         const formattedTx = {
           ...tx,
@@ -422,14 +352,10 @@ function getLineaPricingPlugin(fallbackUrl: string) {
           value: tx.value?.toString(),
         };
 
-        const estimateGas = await provider.send("linea_estimateGas", [
-          formattedTx,
-        ]);
+        const estimateGas = await provider.send("linea_estimateGas", [ formattedTx ]);
         const { baseFeePerGas, priorityFeePerGas } = estimateGas;
         const adjustedPriorityFeePerGas = BigInt(priorityFeePerGas);
-        const adjustedBaseFee =
-          (BigInt(baseFeePerGas) * BigInt(BASE_FEE_PER_GAS_MARGIN * 100)) /
-          BigInt(100);
+        const adjustedBaseFee = (BigInt(baseFeePerGas) * BigInt(BASE_FEE_PER_GAS_MARGIN * 100)) / BigInt(100);
         const gasPrice = adjustedBaseFee + adjustedPriorityFeePerGas;
 
         return {
@@ -454,9 +380,7 @@ function getLineaPricingPlugin(fallbackUrl: string) {
 // See: https://chainlist.org
 let injected = false;
 function injectCommonNetworks(): void {
-  if (injected) {
-    return;
-  }
+  if (injected) { return; }
   injected = true;
 
   /// Register popular Ethereum networks
@@ -515,17 +439,23 @@ function injectCommonNetworks(): void {
 
   registerEth("linea", 59144, {
     ensNetwork: 1,
-    plugins: [getLineaPricingPlugin("https://rpc.linea.build")],
+    plugins: [
+      getLineaPricingPlugin("https://rpc.linea.build")
+    ],
   });
   registerEth("linea-goerli", 59140, {});
 
   registerEth("linea-sepolia", 59141, {
-    plugins: [getLineaPricingPlugin("https://rpc.sepolia.linea.build")],
+    plugins: [
+      getLineaPricingPlugin("https://rpc.sepolia.linea.build")
+    ],
   });
 
   registerEth("matic", 137, {
     ensNetwork: 1,
-    plugins: [getGasStationPlugin("https://gasstation.polygon.technology/v2")],
+    plugins: [
+      getGasStationPlugin("https://gasstation.polygon.technology/v2")
+    ],
   });
   registerEth("matic-amoy", 80002, {});
   registerEth("matic-mumbai", 80001, {
