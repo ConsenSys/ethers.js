@@ -445,7 +445,6 @@ function injectCommonNetworks(): void {
       ],
     });
     registerEth("linea-goerli", 59140, { });
-
     registerEth("linea-sepolia", 59141, {
       plugins: [
         getLineaPricingPlugin("https://rpc.sepolia.linea.build")
