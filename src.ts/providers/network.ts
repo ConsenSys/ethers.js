@@ -4,11 +4,12 @@
  *
  *  @_subsection: api/providers:Networks  [networks]
  */
-
 import { accessListify } from "../transaction/index.js";
 import { getBigInt, assert, assertArgument } from "../utils/index.js";
 
-import { EnsPlugin, FetchUrlFeeDataNetworkPlugin, FetchLineaFeeDataNetworkPlugin, GasCostPlugin } from "./plugins-network.js";
+import {
+    EnsPlugin, FetchUrlFeeDataNetworkPlugin, GasCostPlugin, FetchLineaFeeDataNetworkPlugin
+} from "./plugins-network.js";
 
 import type { BigNumberish } from "../utils/index.js";
 import type { TransactionLike } from "../transaction/index.js";
@@ -413,64 +414,62 @@ function injectCommonNetworks(): void {
     }
   }
 
-  registerEth("mainnet", 1, { ensNetwork: 1, altNames: ["homestead"] });
-  registerEth("ropsten", 3, { ensNetwork: 3 });
-  registerEth("rinkeby", 4, { ensNetwork: 4 });
-  registerEth("goerli", 5, { ensNetwork: 5 });
-  registerEth("kovan", 42, { ensNetwork: 42 });
-  registerEth("sepolia", 11155111, { ensNetwork: 11155111 });
-  registerEth("holesky", 17000, { ensNetwork: 17000 });
+    registerEth("mainnet", 1, { ensNetwork: 1, altNames: ["homestead"] });
+    registerEth("ropsten", 3, { ensNetwork: 3 });
+    registerEth("rinkeby", 4, { ensNetwork: 4 });
+    registerEth("goerli", 5, { ensNetwork: 5 });
+    registerEth("kovan", 42, { ensNetwork: 42 });
+    registerEth("sepolia", 11155111, { ensNetwork: 11155111 });
+    registerEth("holesky", 17000, { ensNetwork: 17000 });
 
-  registerEth("classic", 61, {});
-  registerEth("classicKotti", 6, {});
+    registerEth("classic", 61, { });
+    registerEth("classicKotti", 6, { });
 
-  registerEth("arbitrum", 42161, {
-    ensNetwork: 1,
-  });
-  registerEth("arbitrum-goerli", 421613, {});
-  registerEth("arbitrum-sepolia", 421614, {});
+    registerEth("arbitrum", 42161, {
+      ensNetwork: 1,
+    });
+    registerEth("arbitrum-goerli", 421613, { });
+    registerEth("arbitrum-sepolia", 421614, { });
 
-  registerEth("base", 8453, { ensNetwork: 1 });
-  registerEth("base-goerli", 84531, {});
-  registerEth("base-sepolia", 84532, {});
+    registerEth("base", 8453, { ensNetwork: 1 });
+    registerEth("base-goerli", 84531, { });
+    registerEth("base-sepolia", 84532, { });
 
-  registerEth("bnb", 56, { ensNetwork: 1 });
-  registerEth("bnbt", 97, {});
+    registerEth("bnb", 56, { ensNetwork: 1 });
+    registerEth("bnbt", 97, { });
 
-  registerEth("linea", 59144, {
-    ensNetwork: 1,
-    plugins: [
-      getLineaPricingPlugin("https://rpc.linea.build")
-    ],
-  });
-  registerEth("linea-goerli", 59140, {});
+    registerEth("linea", 59144, {
+      ensNetwork: 1,
+      plugins: [
+        getLineaPricingPlugin("https://rpc.linea.build")
+      ],
+    });
+    registerEth("linea-goerli", 59140, { });
 
-  registerEth("linea-sepolia", 59141, {
-    plugins: [
-      getLineaPricingPlugin("https://rpc.sepolia.linea.build")
-    ],
-  });
+    registerEth("linea-sepolia", 59141, {
+      plugins: [
+        getLineaPricingPlugin("https://rpc.sepolia.linea.build")
+      ],
+    });
 
-  registerEth("matic", 137, {
-    ensNetwork: 1,
-    plugins: [
-      getGasStationPlugin("https://gasstation.polygon.technology/v2")
-    ],
-  });
-  registerEth("matic-amoy", 80002, {});
-  registerEth("matic-mumbai", 80001, {
-    altNames: ["maticMumbai", "maticmum"], // @TODO: Future remove these alts
-    plugins: [
-      getGasStationPlugin("https://gasstation-testnet.polygon.technology/v2"),
-    ],
-  });
-
-  registerEth("optimism", 10, {
-    ensNetwork: 1,
-    plugins: [],
-  });
-  registerEth("optimism-goerli", 420, {});
-  registerEth("optimism-sepolia", 11155420, {});
-
-  registerEth("xdai", 100, { ensNetwork: 1 });
+    registerEth("matic", 137, {
+        ensNetwork: 1,
+        plugins: [
+            getGasStationPlugin("https://gasstation.polygon.technology/v2")
+        ]
+    });
+    registerEth("matic-amoy", 80002, { });
+    registerEth("matic-mumbai", 80001, {
+        altNames: [ "maticMumbai", "maticmum" ],  // @TODO: Future remove these alts
+        plugins: [
+            getGasStationPlugin("https://gasstation-testnet.polygon.technology/v2")
+        ]
+    });
+    registerEth("optimism", 10, {
+        ensNetwork: 1,
+        plugins: [ ]
+    });
+    registerEth("optimism-goerli", 420, { });
+    registerEth("optimism-sepolia", 11155420, { });
+    registerEth("xdai", 100, { ensNetwork: 1 });
 }
